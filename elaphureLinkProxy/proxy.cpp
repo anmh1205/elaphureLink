@@ -18,6 +18,7 @@ class ProxyManager
           current_device_address_(""),
           is_reconnect_thread_running_(false)
     {
+        k_manager_instance = this; // Register instance for static callback
     }
 
     bool is_proxy_running()
@@ -58,26 +59,15 @@ class ProxyManager
             client_.get()->set_connect_callback(on_connect_callback_);
         }
         if (on_socket_disconnect_callback_) {
-            // Use wrapper to handle auto-reconnect
-            client_.get()->set_disconnect_callback([this](const char *msg) {
-                this->on_disconnect_wrapper(msg);
-            });
+            // Store the original callback and set our wrapper
+            client_.get()->set_disconnect_callback(static_disconnect_wrapper);
         }
 
         int ret = client_.get()->init_socket(address, "3240");
         if (ret != 0) {
             return ret;
         }
-
         return client_.get()->start();
-    }
-
-    void stop()
-    {
-        if (client_.get()) {
-            client_.get()->kill();
-        }
-        client_.reset(nullptr);
     }
 
     void set_auto_reconnect(bool enabled)
@@ -178,7 +168,20 @@ class ProxyManager
     std::atomic<int>  reconnect_attempts_;
     std::string       current_device_address_;
     std::atomic<bool> is_reconnect_thread_running_;
+
+    // Static wrapper for disconnect callback
+    static void static_disconnect_wrapper(const char *msg)
+    {
+        if (k_manager_instance) {
+            k_manager_instance->on_disconnect_wrapper(msg);
+        }
+    }
+
+    static ProxyManager *k_manager_instance;
 };
+
+// Define static member
+ProxyManager *ProxyManager::k_manager_instance = nullptr;
 
 ProxyManager k_manager;
 
@@ -205,7 +208,6 @@ PROXY_DLL_FUNCTION void el_proxy_set_on_connect_callback(onSocketConnectCallback
 
 PROXY_DLL_FUNCTION void el_proxy_set_on_disconnect_callback(onSocketDisconnectCallbackType callback)
 {
-    el_proxy_start_with_address(deviceAddress);
     return k_manager.set_on_proxy_disconnect_callback(callback);
 }
 
