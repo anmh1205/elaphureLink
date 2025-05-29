@@ -199,14 +199,12 @@ namespace elaphureLink.Wpf.Core
         public static string GetCurrentDeviceAddress()
         {
             var buffer = new System.Text.StringBuilder(256);
-            int result = el_proxy_get_device_address(buffer, buffer.Capacity);
-
-            if (result == 0)
+            int result = el_proxy_get_device_address(buffer, buffer.Capacity); if (result == 0)
             {
                 return buffer.ToString();
             }
 
-            Logger.Warning($"Failed to get device address, error code: {result}");
+            Logger.Warn($"Failed to get device address, error code: {result}");
             return string.Empty;
         }
     }
