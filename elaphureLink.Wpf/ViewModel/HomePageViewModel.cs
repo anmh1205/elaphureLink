@@ -27,13 +27,12 @@ namespace elaphureLink.Wpf.ViewModel
 
         public HomePageViewModel(ISettingsService settingsService)
         {
-            // design time
-
-            _SettingsService = settingsService;
+            // design time            _SettingsService = settingsService;
 
             _deviceAddress = _SettingsService.GetValue<string>(nameof(deviceAddress));
             _driverPath = _SettingsService.GetValue<string>("keilPathInstallation");
             _EnableVendorCommand = _SettingsService.GetValue<bool>(nameof(EnableVendorCommand));
+            _EnableAutoReconnect = _SettingsService.GetValue<bool>(nameof(EnableAutoReconnect));
 
             InstallDriverCommand = new AsyncRelayCommand(InstallDriverAsync);
             StartProxyCommand = new AsyncRelayCommand(StartProxyAsync);
@@ -45,13 +44,23 @@ namespace elaphureLink.Wpf.ViewModel
             WeakReferenceMessenger.Default.Register<ProxyStatusRequestMessage>(this, (r, m) =>
             {
                 m.Reply(IsProxyStart);
-            });
-
-            WeakReferenceMessenger.Default.Register<ProxyStatusChangedMessage>(this, (r, m) =>
+            }); WeakReferenceMessenger.Default.Register<ProxyStatusChangedMessage>(this, (r, m) =>
             {
                 _SettingsService.SetValue("isProxyRunning", m.Value);
                 if (m.Value == false)
+                {
+                    // Only turn off the switch if auto-reconnect is disabled
+                    // If auto-reconnect is enabled, keep the switch on during reconnection attempts
+                    if (!EnableAutoReconnect)
+                    {
+                        IsProxyStart = m.Value;
+                    }
+                }
+                else
+                {
+                    // Connection successful, always update the switch
                     IsProxyStart = m.Value;
+                }
             });
         }
 
@@ -101,14 +110,17 @@ namespace elaphureLink.Wpf.ViewModel
         {
             await elaphureLink.Wpf.Core.Driver.DriverService.InstallDriver(driverPath);
         }
-
         private async Task StartProxyAsync()
         {
+            // Set auto-reconnect before starting the proxy
+            elaphureLink.Wpf.Core.elaphureLinkCore.SetAutoReconnect(EnableAutoReconnect);
             await elaphureLink.Wpf.Core.elaphureLinkCore.StartProxyAsync(deviceAddress);
         }
 
         private async Task StopProxyAsync()
         {
+            // Disable auto-reconnect when manually stopping
+            elaphureLink.Wpf.Core.elaphureLinkCore.SetAutoReconnect(false);
             await elaphureLink.Wpf.Core.elaphureLinkCore.StopProxyAsync();
         }
 
@@ -193,6 +205,23 @@ namespace elaphureLink.Wpf.ViewModel
                 SetProperty(ref _EnableVendorCommand, value);
                 _SettingsService.SetValue(nameof(EnableVendorCommand), value);
                 ChangeProxyConfigCommand.ExecuteAsync(null);
+            }
+        }
+
+        private bool _EnableAutoReconnect;
+        public bool EnableAutoReconnect
+        {
+            get => _EnableAutoReconnect;
+            set
+            {
+                SetProperty(ref _EnableAutoReconnect, value);
+                _SettingsService.SetValue(nameof(EnableAutoReconnect), value);
+
+                // Update auto-reconnect setting immediately if proxy is running
+                if (IsProxyStart)
+                {
+                    elaphureLink.Wpf.Core.elaphureLinkCore.SetAutoReconnect(value);
+                }
             }
         }
 

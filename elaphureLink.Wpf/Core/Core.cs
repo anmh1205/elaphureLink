@@ -62,6 +62,32 @@ namespace elaphureLink.Wpf.Core
             [MarshalAs(UnmanagedType.FunctionPtr)] OnProxyDisconnectCallbackType callbackPointer
         );
 
+        // Auto-reconnect functions
+        [DllImport(
+            "elaphureLinkProxy.dll",
+            EntryPoint = "el_proxy_set_auto_reconnect",
+            CallingConvention = CallingConvention.Cdecl
+        )]
+        private static extern void el_proxy_set_auto_reconnect(bool enabled);
+
+        [DllImport(
+            "elaphureLinkProxy.dll",
+            EntryPoint = "el_proxy_is_connected",
+            CallingConvention = CallingConvention.Cdecl
+        )]
+        private static extern bool el_proxy_is_connected();
+
+        [DllImport(
+            "elaphureLinkProxy.dll",
+            EntryPoint = "el_proxy_get_device_address",
+            CallingConvention = CallingConvention.Cdecl,
+            CharSet = CharSet.Ansi
+        )]
+        private static extern int el_proxy_get_device_address(
+            [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder buffer,
+            int bufferSize
+        );
+
         private static OnProxyDisconnectCallbackType OnProxyDisconnectCallback = (msg) =>
         {
             Logger.Info(msg);
@@ -145,6 +171,43 @@ namespace elaphureLink.Wpf.Core
         {
             WeakReferenceMessenger.Default.Send(new ProxyStatusChangedMessage(false));
             await Task.Factory.StartNew(() => el_proxy_stop());
+        }
+
+        /// <summary>
+        /// Enable or disable auto-reconnect functionality
+        /// </summary>
+        /// <param name="enabled">True to enable auto-reconnect, false to disable</param>
+        public static void SetAutoReconnect(bool enabled)
+        {
+            Logger.Info($"Auto-reconnect {(enabled ? "enabled" : "disabled")}");
+            el_proxy_set_auto_reconnect(enabled);
+        }
+
+        /// <summary>
+        /// Check if proxy is currently connected
+        /// </summary>
+        /// <returns>True if connected, false otherwise</returns>
+        public static bool IsProxyConnected()
+        {
+            return el_proxy_is_connected();
+        }
+
+        /// <summary>
+        /// Get the current device address being used by the proxy
+        /// </summary>
+        /// <returns>Device address string, or empty string if not set</returns>
+        public static string GetCurrentDeviceAddress()
+        {
+            var buffer = new System.Text.StringBuilder(256);
+            int result = el_proxy_get_device_address(buffer, buffer.Capacity);
+
+            if (result == 0)
+            {
+                return buffer.ToString();
+            }
+
+            Logger.Warning($"Failed to get device address, error code: {result}");
+            return string.Empty;
         }
     }
 }

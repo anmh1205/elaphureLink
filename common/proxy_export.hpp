@@ -56,3 +56,29 @@ PROXY_DLL_FUNCTION void el_proxy_set_on_connect_callback(onSocketConnectCallback
  * @param callback
  */
 PROXY_DLL_FUNCTION void el_proxy_set_on_disconnect_callback(onSocketDisconnectCallbackType callback);
+
+
+/**
+ * @brief Enable or disable auto-reconnect feature when proxy disconnects
+ *
+ * @param enabled true to enable auto-reconnect, false to disable
+ */
+PROXY_DLL_FUNCTION void el_proxy_set_auto_reconnect(bool enabled);
+
+
+/**
+ * @brief Get the current status of the proxy connection
+ *
+ * @return true if proxy is connected, false otherwise
+ */
+PROXY_DLL_FUNCTION bool el_proxy_is_connected();
+
+
+/**
+ * @brief Get the current device address being used by the proxy
+ *
+ * @param buffer buffer to store the device address
+ * @param bufferSize size of the buffer
+ * @return 0 on success, other on fail
+ */
+PROXY_DLL_FUNCTION int el_proxy_get_device_address(char *buffer, int bufferSize);

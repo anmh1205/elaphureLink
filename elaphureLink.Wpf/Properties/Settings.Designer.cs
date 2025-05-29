@@ -8,75 +8,108 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace elaphureLink.Wpf.Properties {
-    
-    
+namespace elaphureLink.Wpf.Properties
+{
+
+
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-        
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
+    {
+
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-        
-        public static Settings Default {
-            get {
+
+        public static Settings Default
+        {
+            get
+            {
                 return defaultInstance;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("dap.local")]
-        public string deviceAddress {
-            get {
+        public string deviceAddress
+        {
+            get
+            {
                 return ((string)(this["deviceAddress"]));
             }
-            set {
+            set
+            {
                 this["deviceAddress"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int logLevel {
-            get {
+        public int logLevel
+        {
+            get
+            {
                 return ((int)(this["logLevel"]));
             }
-            set {
+            set
+            {
                 this["logLevel"] = value;
             }
         }
-        
+
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool isProxyRunning {
-            get {
+        public bool isProxyRunning
+        {
+            get
+            {
                 return ((bool)(this["isProxyRunning"]));
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string keilPathInstallation {
-            get {
+        public string keilPathInstallation
+        {
+            get
+            {
                 return ((string)(this["keilPathInstallation"]));
             }
-            set {
+            set
+            {
                 this["keilPathInstallation"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool EnableVendorCommand {
-            get {
+        public bool EnableVendorCommand
+        {
+            get
+            {
                 return ((bool)(this["EnableVendorCommand"]));
             }
-            set {
+            set
+            {
                 this["EnableVendorCommand"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EnableAutoReconnect
+        {
+            get
+            {
+                return ((bool)(this["EnableAutoReconnect"]));
+            }
+            set
+            {
+                this["EnableAutoReconnect"] = value;
             }
         }
     }
